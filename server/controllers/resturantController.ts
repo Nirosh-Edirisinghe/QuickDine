@@ -15,9 +15,9 @@ export const getResturants = async (req: Request, res: Response): Promise<void> 
 
     if (search) {
       queryObj.$or = [
-        { name: { $regex: search, $options: "1" } },
-        { tags: { $regex: search, $options: "1" } },
-        { location: { $regex: search, $options: "1" } }
+        { name: { $regex: search, $options: "i" } },
+        { tags: { $regex: search, $options: "i" } },
+        { location: { $regex: search, $options: "i" } }
       ]
     }
 
@@ -77,12 +77,13 @@ export const getResturantBySlug = async (req: Request, res: Response): Promise<v
     const resturant = await Resturant.findOne({ slug: req.params.slug })
     if (!resturant) {
       res.status(404).json({ message: "Resturant not found" })
+      return;
     }
 
     // If not approved verify authorization (admin or owner)
     if (resturant?.status !== "approved") {
       let isAuthorized = false;
-      if (req.headers.authorization && req.headers.authorization.startsWith("bearer")) {
+      if (req.headers.authorization && req.headers.authorization.startsWith("Bearer")) {
         try {
           const token = req.headers.authorization.split(" ")[1];
           const decoded = jwt.verify(token, process.env.JWT_SECRET as string) as { id: string }
@@ -115,6 +116,7 @@ export const getResturantAvailability = async (req: Request, res: Response): Pro
     const { date } = req.query;
     if (!date) {
       res.status(400).json({ message: "Please provide a date" })
+      return;
     }
 
     const resturant = await Resturant.findById(req.params.id);
