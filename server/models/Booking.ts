@@ -23,7 +23,8 @@ const BookingSchema = new Schema<IBooking>(
     time: { type: String, required: true },
     guests: { type: Number, required: true, min: 1 },
     occasion: { type: String, trime: true },
-    specialRequests: { type: String, enum: ["confirmed", "cancelled", "completed"], default: "confirmed" },
+    specialRequests: {type: String, trim: true},
+    status: { type: String, enum: ["confirmed", "cancelled", "completed"], default: "confirmed" },
     bookingId: { type: String, unique: true },
   },
   { timestamps: true }
@@ -32,7 +33,7 @@ const BookingSchema = new Schema<IBooking>(
 // Auto generate reference code on save
 BookingSchema.pre("save", function () {
   if (!this.bookingId) {
-    this.bookingId = `GR-${crypto.randomBytes(4).toString("hex").toUpperCase}`
+    this.bookingId = `GR-${crypto.randomBytes(4).toString("hex").toUpperCase()}`
   }
 })
 
